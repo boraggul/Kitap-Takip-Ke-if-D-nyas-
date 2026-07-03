@@ -1,0 +1,41 @@
+{
+    "kitaplar": [
+        {
+            "baslik": "Algernon'a Çiçekler",
+            "yazar": "Daniel Keyes",
+            "okundu": true,
+            "puan": "3/5"
+        },
+        {
+            "baslik": "Treasure Island",
+            "yazar": "Robert Louis Stevenson",
+            "kategori": "Genel",
+            "okundu": true
+        },
+        {
+            "baslik": "Küçük Prens",
+            "yazar": "Antoine De SaintExupery",
+            "kategori": "Genel",
+            "okundu": false
+        },
+        {
+            "baslik": "Metamorphosis",
+            "yazar": "Franz Kafka",
+            "kategori": "Genel",
+            "okundu": false
+        },
+        {
+            "baslik": "Treasure Island",
+            "yazar": "Robert Louis Stevenson",
+            "kategori": "Genel",
+            "okundu": false
+        },
+        {
+            "baslik": "Heidi",
+            "yazar": "Spyri, Johanna",
+            "kategori": "Genel",
+            "okundu": true
+        }
+    ],
+    "gunun_notu": "Bilmemek ayıp değil, öğrenmemek ayıp."
+}

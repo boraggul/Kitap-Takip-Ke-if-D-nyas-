@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Takip & Canlı Keşif Dünyası</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome İkonları -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top, #1e2530 0%, #151a22 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .main-title {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        .custom-card {
+            border: 1px solid #2d3748;
+            border-radius: 16px;
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+        .side-widget {
+            background: rgba(26, 32, 44, 0.6);
+            border: 1px dashed #2d3748;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .stat-card {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #4a5568;
+        }
+        .table-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2d3748;
+        }
+        .table { color: #e2e8f0; margin-bottom: 0; }
+        .table th { background-color: #2d3748 !important; color: #a0aec0 !important; }
+        .table td { background-color: #1a202c !important; border-bottom: 1px solid #2d3748; }
+        .btn-gradient-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; }
+        .btn-gradient-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; }
+        .badge-kategori { background-color: #2d3748; color: #cbd5e1; font-weight: 500; border-radius: 8px; padding: 6px 12px; }
+        .nav-pill-custom { border-radius: 12px; font-weight: 500; color: #a0aec0; }
+        .dark-search { background-color: #2d3748 !important; color: #fff !important; border: 1px solid #4a5568 !important; }
+        .kesif-item { background: #2d3748; border-left: 4px solid #6366f1; }
+        .kesif-item:hover { background: #3a475c; }
+        .quote-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%); border: 1px solid #2d3748; border-radius: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid px-5 my-5">
+        
+        <!-- Başlık -->
+        <div class="text-center mb-4 p-4 custom-card shadow-sm">
+            <h1 class="display-5 main-title"><i class="fa-solid fa-book-open-reader me-2"></i>Kitap Takip & Keşif Dünyası</h1>
+            <p class="text-muted mb-0">Kendi dijital kütüphanenizi yönetin, dünya kütüphanelerinden yeni maceralar keşfedin!</p>
+        </div>
+
+        <div class="row g-4">
+            
+            <!-- 1. EN SOL SÜTUN: ARTIK TAMAMEN DİNAMİK OLAN HEDEF VE NOT ALANI -->
+            <div class="col-xl-2 col-lg-3">
+                <div class="side-widget mb-4">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-bullseye me-2"></i> Okuma Hedefi</h6>
+                    <div class="text-center bg-dark p-3 rounded-3 border border-secondary mb-3">
+                        <span class="text-muted small d-block">2026 Hedefi</span>
+                        <!-- Arka planda okunan kitap sayısına göre otomatik değişiyor -->
+                        <h4 class="fw-bold text-white my-1">{{ stats.okunan }} / {{ stats.hedef_toplam }}</h4>
+                        <span class="badge bg-primary-subtle text-primary" style="font-size: 0.7rem;">%{{ stats.hedef_yuzde }} Tamamlandı</span>
+                    </div>
+                    <div class="progress bg-dark mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-primary" style="width: {{ stats.hedef_yuzde }}%"></div>
+                    </div>
+                </div>
+
+                <div class="side-widget">
+                    <h6 class="fw-bold text-warning mb-3"><i class="fa-solid fa-pen-fancy me-2"></i> Bugünün Notu</h6>
+                    <!-- Notu kaydetmek için Flask rotasına bağladık -->
+                    <form action="/not_kaydet" method="POST">
+                        <textarea name="not_icerik" class="form-control bg-dark text-white border-secondary small" rows="4" style="font-size: 0.8rem; resize: none;" placeholder="Okuduğun kitaplardan aklında kalanları buraya yaz kanka...">{{ gunun_notu }}</textarea>
+                        <button type="submit" class="btn btn-sm btn-outline-warning w-100 mt-2" style="font-size: 0.75rem;">Notu Hafızaya Al</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. ORTA SÜTUN: ANA PANEL -->
+            <div class="col-xl-8 col-lg-6">
+                <!-- İSTATİSTİKLER -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="text-muted small text-uppercase fw-bold">Toplam</div>
+                            <h3 class="fw-bold mt-1 mb-0 text-white">{{ stats.toplam }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="text-muted small text-uppercase fw-bold">Okunan</div>
+                            <h3 class="fw-bold mt-1 mb-0 text-success">{{ stats.okunan }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="text-muted small text-uppercase fw-bold">Okunacak</div>
+                            <h3 class="fw-bold mt-1 mb-0 text-warning">{{ stats.okunacak }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="text-muted small text-uppercase fw-bold">Oran</div>
+                            <h3 class="fw-bold mt-1 mb-0 text-info">%{{ stats.oran }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- OKUMA LİSTEM -->
+                    <div class="col-xl-7 col-12">
+                        <div class="card custom-card shadow-sm mb-4">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <h5 class="fw-bold mb-0 text-white">Okuma Listem</h5>
+                                <div class="p-1 rounded-3" style="background-color: #2d3748;">
+                                    <a href="/?filtre=tumu" class="btn btn-sm nav-pill-custom {% if filtre == 'tumu' %}btn-gradient-primary text-white shadow-sm{% endif %}">Tümü</a>
+                                    <a href="/?filtre=okunmadi" class="btn btn-sm nav-pill-custom {% if filtre == 'okunmadi' %}btn-gradient-primary text-white shadow-sm{% endif %}">Okunacaklar</a>
+                                    <a href="/?filtre=okundu" class="btn btn-sm nav-pill-custom {% if filtre == 'okundu' %}btn-gradient-primary text-white shadow-sm{% endif %}">Okunanlar</a>
+                                </div>
+                            </div>
+                            <div class="card-body px-4 pb-4">
+                                <div class="mb-3">
+                                    <div class="progress bg-dark" style="height: 6px; border-radius: 4px;">
+                                        <div class="progress-bar bg-success" style="width: {{ stats.oran }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="table-container shadow-sm">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-3">Kitap</th>
+                                                <th>Yazar</th>
+                                                <th>Durum</th>
+                                                <th class="text-end pe-3">Sil</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for index, kitap in benim_kitaplar %}
+                                            <tr>
+                                                <td class="ps-3">
+                                                    <div class="fw-bold text-white text-truncate" style="max-width: 130px;">{{ kitap.baslik }}</div>
+                                                    <span class="badge badge-kategori mt-1" style="font-size: 0.65rem;">{{ kitap.kategori }}</span>
+                                                </td>
+                                                <td class="text-info fw-semibold small text-truncate" style="color: #a5b4fc !important; max-width: 100px;">{{ kitap.yazar }}</td>
+                                                <td>
+                                                    {% if kitap.okundu %}
+                                                        <a href="/durum/{{ index }}" class="text-decoration-none">
+                                                            <span class="badge rounded-pill text-success border border-success small p-1 px-2" style="background-color: rgba(16, 185, 129, 0.1) !important;">Okundu</span>
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="/durum/{{ index }}" class="text-decoration-none">
+                                                            <span class="badge rounded-pill text-warning border border-warning small p-1 px-2" style="background-color: rgba(245, 158, 11, 0.1) !important;">Bekliyor</span>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end pe-3">
+                                                    <a href="/sil/{{ index }}" class="text-danger" onclick="return confirm('Silinsin mi? 😢')"><i class="fa-solid fa-trash"></i></a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CANLI RADAR -->
+                    <div class="col-xl-5 col-12">
+                        <div class="card custom-card shadow-sm border-0">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-3 text-white">Canlı Radar</h5>
+                                <form action="/" method="GET" class="d-flex gap-2 shadow-sm p-1 rounded-3 border" style="background-color: #2d3748; border-color: #4a5568 !important;">
+                                    <input type="text" name="arama" value="{{ arama }}" class="form-control border-0 bg-transparent text-white dark-search small py-1" placeholder="Kitap veya yazar ara..." required>
+                                    <button type="submit" class="btn btn-gradient-primary rounded-3 px-2 py-0"><i class="fa-solid fa-magnifying-glass" style="font-size: 0.8rem;"></i></button>
+                                </form>
+                            </div>
+                            <div class="card-body px-4 pb-4">
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    <a href="/?kategori=Fiction" class="btn btn-xs btn-outline-primary btn-sm rounded-pill" style="font-size: 0.7rem;">Roman</a>
+                                    <a href="/?kategori=History" class="btn btn-xs btn-outline-warning btn-sm rounded-pill" style="font-size: 0.7rem;">Tarih</a>
+                                    <a href="/?kategori=Science" class="btn btn-xs btn-outline-info btn-sm rounded-pill" style="font-size: 0.7rem;">Bilim</a>
+                                    <a href="/?kategori=Computers" class="btn btn-xs btn-outline-success btn-sm rounded-pill" style="font-size: 0.7rem;">Yazılım</a>
+                                </div>
+                                <div class="row g-2">
+                                    {% for k in canli_kitaplar %}
+                                    <div class="col-12">
+                                        <div class="card border-0 p-2 rounded-3 kesif-item text-white shadow-sm" style="font-size: 0.8rem;">
+                                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                                <div class="text-truncate" style="max-width: 70%;">
+                                                    <span class="fw-bold d-block text-truncate">{{ k.baslik }}</span>
+                                                    <small class="text-muted text-truncate d-block">✍️ {{ k.yazar }}</small>
+                                                </div>
+                                                <form action="/ekle" method="POST">
+                                                    <input type="hidden" name="baslik" value="{{ k.baslik }}">
+                                                    <input type="hidden" name="yazar" value="{{ k.yazar }}">
+                                                    <input type="hidden" name="kategori" value="{{ k.kategori }}">
+                                                    <button type="submit" class="btn btn-xs btn-gradient-success rounded-3 py-1 px-2 fw-bold" style="font-size: 0.7rem;">+ Ekle</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. EN SAĞ SÜTUN -->
+            <div class="col-xl-2 col-lg-3">
+                <div class="side-widget mb-4">
+                    <h6 class="fw-bold text-info mb-3"><i class="fa-solid fa-fire me-2"></i> Global Trendler</h6>
+                    <ul class="list-unstyled mb-0 small" style="line-height: 1.8;">
+                        <li><span class="text-primary fw-bold">1.</span> Silmarillion</li>
+                        <li><span class="text-primary fw-bold">2.</span> Dune Mesihi</li>
+                        <li><span class="text-primary fw-bold">3.</span> Homo Sapiens</li>
+                    </ul>
+                </div>
+                <div class="card quote-card p-3 text-center shadow-sm">
+                    <i class="fa-solid fa-quote-left text-primary mb-2 opacity-50" style="font-size: 1.2rem;"></i>
+                    <p class="fst-italic text-light mb-2" style="font-size: 0.8rem;">"{{ gunun_sozu.soz }}"</p>
+                    <small class="fw-bold text-indigo" style="color: #a855f7; font-size: 0.75rem;">— {{ gunun_sozu.yazar }}</small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
